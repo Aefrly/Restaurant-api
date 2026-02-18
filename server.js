@@ -123,9 +123,9 @@ const handleValidationErrors = (req, res, next) => {
         });
     }
   
-    // Set default value for completed if not provided
-    if (req.body.completed === undefined) {
-        req.body.completed = false;
+    // Set default value for available if not provided
+    if (req.body.available === undefined) {
+        req.body.available = true;
     }
   
     next();
