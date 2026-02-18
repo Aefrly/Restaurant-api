@@ -83,7 +83,7 @@ const requestLogger = (req, res, next) => {
 // Custom logging middleware
 app.use(requestLogger);
 
-// Complete validation rules for todos
+// Complete validation rules for menu items
 const menuValidation = [
   body('name')
     .isLength({ min: 3 })
@@ -138,8 +138,8 @@ app.get('/api/menu', (req, res) => {
 });
 
 app.get('/api/menu/:id', (req, res) => {
-    const menuid = parseInt(req.params.id);
-    const menu = menuItems.find(item => item.id === menuid);
+    const menuId = parseInt(req.params.id);
+    const menu = menuItems.find(item => item.id === menuId);
 
     if (menu) {
         res.json(menu);
