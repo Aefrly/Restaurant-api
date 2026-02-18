@@ -106,6 +106,7 @@ const menuValidation = [
     .withMessage('Ingredients must be an array with at least one ingredient'),
   
   body('available')
+    .optional()
     .isBoolean()
     .withMessage('Available must be true or false')
 ];
