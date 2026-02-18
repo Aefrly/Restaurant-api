@@ -63,6 +63,73 @@ const menuItems = [
 ];
 
 // Define routes and implement middleware here
+//Middleware
+app.use(express.json());
+
+// Custom middleware for logging requests
+const requestLogger = (req, res, next) => {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] ${req.method} ${req.originalUrl}`);
+  
+    // Log request body for POST and PUT requests
+    if (req.method === 'POST' || req.method === 'PUT') {
+         console.log('Request Body:',
+   JSON.stringify(req.body, null, 2));
+}
+  
+    next(); // Pass control to next middleware
+};
+
+// Custom logging middleware
+app.use(requestLogger);
+
+// Complete validation rules for todos
+const menuValidation = [
+  body('name')
+    .isLength({ min: 3 })
+    .withMessage('Name must be at least 3 characters long'),
+  
+  body('description')
+    .isLength({ min: 10 })
+    .withMessage('Description must be at least 10 characters long'),
+  
+  body('price')
+    .isFloat({ min: 0 })
+    .withMessage('Price must be a positive number'),
+  
+  body('category')
+    .isIn(['appetizer', 'entree', 'dessert', 'beverage'])
+    .withMessage('Category must be appetizer, entree, dessert, or beverage'),
+  
+  body('ingredients')
+    .isArray({ min: 1 })
+    .withMessage('Ingredients must be an array with at least one ingredient'),
+  
+  body('available')
+    .isBoolean()
+    .withMessage('Available must be true or false')
+];
+
+const handleValidationErrors = (req, res, next) => {
+    const errors = validationResult(req);
+  
+    if (!errors.isEmpty()) {
+        const errorMessages =
+    errors.array().map(error => error.msg);
+    
+        return res.status(400).json({
+            error: 'Validation failed',
+            messages: errorMessages
+        });
+    }
+  
+    // Set default value for completed if not provided
+    if (req.body.completed === undefined) {
+        req.body.completed = false;
+    }
+  
+    next();
+};
 
 //Routes
 app.get('/api/menu', (req, res) => {
