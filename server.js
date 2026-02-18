@@ -1,6 +1,8 @@
 // Import packages, initialize an express app, and define the port you will use
-
-
+const express = require('express');
+const app = express();
+const port = 3000;
+const { body, validationResult } = require('express-validator');
 
 // Data for the server
 const menuItems = [
@@ -61,3 +63,75 @@ const menuItems = [
 ];
 
 // Define routes and implement middleware here
+
+//Routes
+app.get('/api/menu', (req, res) => {
+    res.json(menuItems);
+});
+
+app.get('/api/menu/:id', (req, res) => {
+    const menuid = parseInt(req.params.id);
+    const menu = menuItems.find(item => item.id === menuid);
+
+    if (menu) {
+        res.json(menu);
+    } else {
+        res.status(404).json({ error: 'Menu item not found' });
+    }
+});
+
+app.post('/api/menu', menuValidation, handleValidationErrors, (req, res) => {
+    const { name, description, price, category, ingredients, available } = req.body;
+
+    const newMenuItem = {
+        id: menuItems.length + 1,
+        name,
+        description,
+        price,
+        category,
+        ingredients,
+        available
+    };
+
+    menuItems.push(newMenuItem);
+    res.status(201).json(newMenuItem);
+});
+
+app.put('/api/menu/:id', menuValidation, handleValidationErrors, (req, res) => {
+    const menuId = parseInt(req.params.id);
+    const { name, description, price, category, ingredients, available } = req.body;
+
+    const menuIndex = menuItems.findIndex(item => item.id === menuId);
+
+    if (menuIndex === -1) {
+        return res.status(404).json({ error: 'Menu item not found' });
+    }
+
+    menuItems[menuIndex] = {
+        id: menuId,
+        name,
+        description,
+        price,
+        category,
+        ingredients,
+        available
+    };
+
+    res.json(menuItems[menuIndex]);
+});
+
+app.delete('/api/menu/:id', (req, res) => {
+    const menuId = parseInt(req.params.id);
+    const menuIndex = menuItems.findIndex(item => item.id === menuId);
+
+    if (menuIndex === -1) {
+        return res.status(404).json({ error: 'Menu item not found' });
+    }
+
+    const deletedMenuItem = menuItems.splice(menuIndex, 1)[0];
+    res.json({ message: 'Menu item deleted successfully', deletedItem: deletedMenuItem });
+});
+
+app.listen(port, () => {
+    console.log(`Menu API is running on http://localhost:${port}`);
+});
